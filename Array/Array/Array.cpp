@@ -276,3 +276,25 @@ bool Array::operator==(const Array& other) const {
 bool Array::operator!=(const Array& other) const {
     return !(*this == other);
 }
+
+std::istream& operator>>(std::istream& is, Array& arr) {
+    int size;
+    is >> size;
+    if (size < 0) {
+        size = -size;
+    }
+    for (int i = 0; i < size; ++i) {
+        is >> arr[i];
+    }
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const Array& arr) {
+    os << "[";
+    for (int i = 0; i < arr.size(); ++i) {
+        os << arr[i];
+        if (i < arr.size() - 1) os << ", ";
+    }
+    os << "]";
+    return os;
+}

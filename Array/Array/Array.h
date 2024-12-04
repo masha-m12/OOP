@@ -57,3 +57,6 @@ private:
     int* m_array = nullptr;
     int m_size = 0;
 };
+
+std::istream& operator>>(std::istream& is, Array& arr); 
+std::ostream& operator<<(std::ostream& os, const Array& arr);
