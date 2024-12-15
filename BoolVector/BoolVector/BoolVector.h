@@ -35,6 +35,7 @@ public:
     int weight() const;
 
     Rank operator[](int index);
+    const Rank operator [](int index) const;
 
     BoolVector operator&(const BoolVector& other) const;
     BoolVector& operator&=(const BoolVector& other);

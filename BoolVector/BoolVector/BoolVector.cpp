@@ -104,8 +104,15 @@ void BoolVector::setBits(int index, int count, bool value)
 
 void BoolVector::setAll(bool value)
 {
-    for (int i = 0; i < m_length; ++i) {
-        setBitValue(i, value);
+    if (value) {
+        for (int i = 0; i < m_cellCount; ++i) {
+            m_cells[i] = ~0;
+        }
+    }
+    else {
+        for (int i = 0; i < m_cellCount; ++i) {
+            m_cells[i] = 0;
+        }
     }
 }
 
@@ -149,15 +156,21 @@ BoolVector::Rank BoolVector::operator[](int index)
     return Rank(&m_cells[index / CellSize], _mask(index));
 }
 
+const BoolVector::Rank BoolVector::operator[](int index) const
+{
+    if (index < 0 || index >= m_length) {
+        throw std::out_of_range("Index out of range");
+    }
+    return Rank(&m_cells[index / CellSize], _mask(index));
+}
+
 BoolVector BoolVector::operator&(const BoolVector& other) const
 {
     if (m_length != other.m_length) {
         throw std::invalid_argument("Vectors must have same length");
     }
-    BoolVector result(m_length);
-    for (int i = 0; i < m_cellCount; ++i) {
-        result.m_cells[i] = m_cells[i] & other.m_cells[i];
-    }
+    BoolVector result(*this);
+    result &= other;
     return result;
 }
 
@@ -177,10 +190,8 @@ BoolVector BoolVector::operator|(const BoolVector& other) const
     if (m_length != other.m_length) {
         throw std::invalid_argument("Vectors must have same length");
     }
-    BoolVector result(m_length);
-    for (int i = 0; i < m_cellCount; ++i) {
-        result.m_cells[i] = m_cells[i] | other.m_cells[i];
-    }
+    BoolVector result(*this);
+    result |= other;
     return result;
 }
 
@@ -200,10 +211,8 @@ BoolVector BoolVector::operator^(const BoolVector& other) const
     if (m_length != other.m_length) {
         throw std::invalid_argument("Vectors must have same length");
     }
-    BoolVector result(m_length);
-    for (int i = 0; i < m_cellCount; ++i) {
-        result.m_cells[i] = m_cells[i] ^ other.m_cells[i];
-    }
+    BoolVector result(*this);
+    result ^= other;
     return result;
 }
 
@@ -223,9 +232,15 @@ BoolVector BoolVector::operator>>(int shift) const
     if (shift < 0) {
         throw std::invalid_argument("Shift must be >0");
     }
+    if (shift >= m_length) {
+        return BoolVector(m_length);
+    }
     BoolVector result(m_length);
-    for (int i = 0; i < m_cellCount; i++) {
-        result.m_cells[i] = m_cells[i] >> shift;
+    for (int i = m_length - 1; i >= shift; i--) {
+        result[i] = bitValue(i - shift);
+    }
+    for (int i = 0; i < shift; i++) {
+        result[i] = false;
     }
     return result;
 }
@@ -235,43 +250,45 @@ BoolVector BoolVector::operator<<(int shift) const
     if (shift < 0) {
         throw std::invalid_argument("Shift must be >0");
     }
+    if (shift >= m_length) {
+        return BoolVector(m_length);
+    }
     BoolVector result(m_length);
-    for (int i = 0; i < m_cellCount; i++) {
-        result.m_cells[i] = m_cells[i] << shift;
+    for (int i = 0; i < m_length - shift; ++i) {
+        result[i] = bitValue(i + shift);
+    }
+    for (int i = m_length - shift; i < m_length; ++i) {
+        result[i] = false;
     }
     return result;
 }
 
 BoolVector& BoolVector::operator>>=(int shift)
 {
-    if (shift < 0) {
-        throw std::invalid_argument("Shift must be >0");
-    }
-    for (int i = 0; i < m_cellCount; i++) {
-        m_cells[i] >>= shift;
-    }
+    BoolVector shifted = *this >> shift;
+    *this = shifted;
     return *this;
 }
 
-BoolVector& BoolVector::operator<<=(int shift) {
-    if (shift < 0) {
-        throw std::invalid_argument("Shift must be >0");
-    }
-    for (int i = 0; i < m_cellCount; i++) {
-        m_cells[i] <<= shift;
-    }
+BoolVector& BoolVector::operator<<=(int shift)
+{
+    BoolVector shifted = *this << shift;
+    *this = shifted;
     return *this;
 }
 
-BoolVector BoolVector::operator~() const {
+BoolVector BoolVector::operator~() const
+{
     BoolVector result(m_length);
     for (int i = 0; i < m_cellCount; ++i) {
-        result.m_cells[i] = ~m_cells[i];
+        result.m_cells[i] = m_cells[i];
     }
+    result.inversion();
     return result;
 }
 
-BoolVector& BoolVector::operator=(const BoolVector& other) {
+BoolVector& BoolVector::operator=(const BoolVector& other)
+{
     if (this == &other) {
         return *this;
     }
