@@ -266,14 +266,14 @@ BoolVector BoolVector::operator<<(int shift) const
 BoolVector& BoolVector::operator>>=(int shift)
 {
     BoolVector shifted = *this >> shift;
-    *this = shifted;
+    std::swap(*this, shifted);
     return *this;
 }
 
 BoolVector& BoolVector::operator<<=(int shift)
 {
     BoolVector shifted = *this << shift;
-    *this = shifted;
+    std::swap(*this, shifted);
     return *this;
 }
 
