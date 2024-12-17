@@ -16,14 +16,17 @@ void Fraction::setNumerator(const int numerator) {
 
 void Fraction::setDenominator(const int denominator) {
     if (denominator == 0) {
-        std::cout << "ERROR: denominator can't be 0";
+        throw std::invalid_argument("ERROR: denominator is 0; changing to 1");
+        this->denominator = 1;
     }
-    this->denominator = denominator;
+    else {
+        this->denominator = denominator;
+    }
 }
 
 void Fraction::reduction() {
     if (denominator == 0) {
-        std::cout << "\nERROR: denominator is 0; changing to 1\n";
+        throw std::invalid_argument("ERROR: denominator is 0; changing to 1");
         denominator = 1;
     }
     Fraction c;
@@ -89,8 +92,8 @@ void Fraction::input() {
     std::cin >> numerator;
     std::cout << '/' << "\n";
     std::cin >> denominator;
-    while (denominator == 0) {
-        std::cerr << "\nERROR: denominator is 0; changing to 1\n";
+    if (denominator == 0) {
+        throw std::invalid_argument("ERROR: denominator is 0; changing to 1");
         denominator = 1;
     }
 }
@@ -102,8 +105,13 @@ void Fraction::output() const {
 int Fraction::gcd() const {
     int a = abs(this->numerator);
     int b = abs(this->denominator);
+    if (this->denominator == 0) {
+        throw std::invalid_argument("ERROR: denominator is 0; returning numerator");
+        return a;
+    }
     if (this->numerator == 0 && this->denominator == 0) {
-        std::cout << "ERROR: both numerator and denominator are 0";
+        throw std::invalid_argument("ERROR: both numerator and denominator are 0; returning 0");
+        return 0;
     }
     while (b != 0) {
         int temp = b;
@@ -115,16 +123,17 @@ int Fraction::gcd() const {
 
 Fraction Fraction::fromDouble(double value, int precision) {
     if (precision <= 0) {
-        std::cout << "ERROR: precision must be >0";
+        throw std::invalid_argument("ERROR: precision must be >0");
     }
+    int scale = static_cast<int>(pow(10, precision)); //10^precision
     int numerator;
     if (value >= 0) {
-        numerator = static_cast<int>(value * precision + 0.5);
+        numerator = static_cast<int>(value * scale + 0.5);
     }
     else {
-        numerator = static_cast<int>(value * precision - 0.5);
+        numerator = static_cast<int>(value * scale - 0.5);
     }
-    int denominator = precision;
+    int denominator = scale;
     Fraction fraction(numerator, denominator);
     fraction.reduction();
     return fraction;
