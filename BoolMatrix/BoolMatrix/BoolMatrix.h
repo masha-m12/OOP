@@ -25,8 +25,8 @@ public:
     void inversion(int row, int column);
     void inversionComponents(int row, int column, int value);
 
-    void set(int row, int columns, bool value);
-    void setComponents(int row, int column, bool count, int value);
+    void set(int row, int column, bool value);
+    void setComponents(int row, int column, int value, bool count);
 
     BoolMatrix& operator=(const BoolMatrix& other);
 
