@@ -33,7 +33,9 @@ BoolMatrix::BoolMatrix(const BoolMatrix& other)
 }
 
 BoolMatrix::~BoolMatrix()
-{}
+{
+    delete[] m_matrix;
+}
 
 int BoolMatrix::getRows() const
 {
@@ -69,7 +71,7 @@ int BoolMatrix::rowWeight(int row) const
 
 BoolVector BoolMatrix::conjunctionAllRows() const
 {
-    BoolVector bv(m_columns, 1);
+    BoolVector bv(m_rows, 1);
     for (int i = 0; i < m_rows; i++) {
         bv = bv & m_matrix[i];
     }
@@ -92,12 +94,12 @@ void BoolMatrix::inversion(int row, int column)
     m_matrix[row].inversionBit(column);
 }
 
-void BoolMatrix::inversionComponents(int row, int column, int value)
+void BoolMatrix::inversionComponents(int row, int column, int count)
 {
     if (row < 0 || row >= m_rows || column < 0 || column >= m_columns) {
         throw std::out_of_range("Index out of range");
     }
-    for (int i = 0; i < value; i++)
+    for (int i = 0; i < count; i++)
         m_matrix[row].inversionBit(column+i);
 }
 
@@ -109,12 +111,12 @@ void BoolMatrix::set(int row, int column, bool value)
     m_matrix[row].setBitValue(column, value);
 }
 
-void BoolMatrix::setComponents(int row, int column, int value, bool count)
+void BoolMatrix::setComponents(int row, int column, bool value, int count)
 {
     if (row < 0 || row >= m_rows || column < 0 || column >= m_columns) {
         throw std::out_of_range("Index out of range");
     }
-    m_matrix[row].setBits(column, value, count);
+    m_matrix[row].setBits(column, count, value);
 }
 
 BoolMatrix& BoolMatrix::operator=(const BoolMatrix& other)

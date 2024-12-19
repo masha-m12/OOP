@@ -23,10 +23,10 @@ public:
     BoolVector disjunctionAllRows() const;
 
     void inversion(int row, int column);
-    void inversionComponents(int row, int column, int value);
+    void inversionComponents(int row, int column, int count);
 
     void set(int row, int column, bool value);
-    void setComponents(int row, int column, int value, bool count);
+    void setComponents(int row, int column, bool value, int count);
 
     BoolMatrix& operator=(const BoolMatrix& other);
 
