@@ -7,14 +7,14 @@ int main() {
     int n;
     std::cout << "Enter number of array values: ";
     std::cin >> n;
-    Array arr(n);
+    Array<int> arr(n);
 
     std::cout << "Enter array values:\n";
     arr.input();
     std::cout << "Array: ";
     arr.output();
 
-    Array arr1(arr);
+    Array<int> arr1(arr);
     std::cout << "Copied array: ";
     arr1.output();
 
