@@ -156,7 +156,7 @@ std::istream& operator>>(std::istream& is, Set& cs) {
     std::string line;
     if (std::getline(is, line)) {
         for (char c : line) {
-            if (c >= cs.start && c < cs.end) {
+            if (c >= cs.start && c <= cs.end) {
                 cs.setBitValue(c - cs.start, true);
             }
         }
