@@ -1,4 +1,5 @@
 ﻿#include "Set.h"
+#include <string>
 
 Set::Set() : BoolVector(charSize) {}
 
@@ -14,7 +15,7 @@ Set::Set(const Set& other) : BoolVector(other) {}
 Set::~Set() {}
 
 bool Set::contains(char element) const {
-    if (element < start || element >= end) {
+    if (element < start || element > end) {
         throw std::out_of_range("Element out of range");
     }
     return bitValue(element - start);
@@ -130,20 +131,20 @@ Set& Set::operator-=(char element) {
 }
 
 void Set::addElement(char element) {
-    if (element < start || element >= end) {
+    if (element < start || element > end) {
         throw std::out_of_range("Element out of range");
     }
     setBitValue(element - start, true);
 }
 
 void Set::deleteElement(char element) {
-    if (element < start || element >= end) {
+    if (element < start || element > end) {
         throw std::out_of_range("Element out of range");
     }
     setBitValue(element - start, false);
 }
 
-std::ostream & operator<<(std::ostream & os, const Set & cs) {
+std::ostream& operator<<(std::ostream& os, const Set& cs) {
     os << "{ ";
     for (size_t i = 0; i < cs.charSize; ++i) {
         if (cs.bitValue(i)) os << static_cast<char>(i + cs.start) << " ";
@@ -151,12 +152,13 @@ std::ostream & operator<<(std::ostream & os, const Set & cs) {
     os << "}";
     return os;
 }
-
 std::istream& operator>>(std::istream& is, Set& cs) {
-    char c;
-    while (is >> c) {
-        if (c >= cs.start && c < cs.end) {
-            cs.setBitValue(c - cs.start, true);
+    std::string line;
+    if (std::getline(is, line)) {
+        for (char c : line) {
+            if (c >= cs.start && c < cs.end) {
+                cs.setBitValue(c - cs.start, true);
+            }
         }
     }
     return is;
