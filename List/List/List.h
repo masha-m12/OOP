@@ -108,7 +108,7 @@ public:
     bool operator==(const TemplateIterator& other) const;
     bool operator!=(const TemplateIterator& other) const;
 
-protected:
+public:
     Node* m_node = nullptr;
 };
 
@@ -597,11 +597,15 @@ bool List<T>::TemplateIterator<ItemType>::operator!=(const TemplateIterator& oth
 
 template <typename T>
 std::istream& operator>>(std::istream& is, List<T>& other)
-{
+{ 
+    int count;
+    is >> count;
     T value;
-    while (is >> value)
-    {
-        other.addToTail(value);
+    for (int i = 0; i < count; ++i) {
+        if (is >> value)
+        {
+            other.addToTail(value);
+        }
     }
     return is;
 }
