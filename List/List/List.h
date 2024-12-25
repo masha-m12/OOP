@@ -123,22 +123,16 @@ List<T>::List()
 
 template<typename T>
 inline List<T>::List(const T* array, int const size)
-    : m_head(new Node())
-    , m_tail(new Node())
+    : List()
 {
-    m_head->next = m_tail;
-    m_tail->prev = m_head;
     for (int i = 0; i < size; i++)
         addToTail(array[i]);
 }
 
 template<typename T>
 List<T>::List(const List<T>& other)
-    : m_head(new Node())
-    , m_tail(new Node())
+    : List()
 {
-    m_head->next = m_tail;
-    m_tail->prev = m_head;
     Node* runner = other.m_head->next;
     while (runner != other.m_tail)
     {
@@ -329,28 +323,9 @@ void List<T>::deleteAtPosition(int position) {
 template<typename T>
 void List<T>::deleteByKey(const T& key)
 {
-    Node* runner = m_head->next;
-    while (runner != m_tail)
-    {
-        if (runner->value == key)
-        {
-            if (runner->prev) {
-                runner->prev->next = runner->next;
-            }
-            if (runner->next) {
-                runner->next->prev = runner->prev;
-            }
-            if (runner == m_head->next) {
-                m_head->next = runner->next;
-            }
-            if (runner == m_tail->prev) {
-                m_tail->prev = runner->prev;
-            }
-            delete runner;
-            --m_size;
-            return;
-        }
-        runner = runner->next;
+    iterator it = findValue(key);
+    if (it != end()) {
+        deleteByIterator(it);
     }
 }
 
@@ -361,17 +336,18 @@ List<T>::iterator List<T>::deleteByIterator(iterator position)
         return position;
     }
     Node* node = position.m_node;
+    ++position;
     node->prev->next = node->next;
     node->next->prev = node->prev;
     delete node;
     --m_size;
-    return iterator(node->next);
+    return position;
 }
 
 template <typename T> typename
 List<T>::iterator List<T>::deleteRangeByIterator(iterator begin, iterator end)
 {
-    if (begin == end || begin == this->end() || end == this->end()) {
+    if (begin == end || begin == this->end()) {
         return end;
     }
     iterator runner = begin;
@@ -622,11 +598,9 @@ bool List<T>::TemplateIterator<ItemType>::operator!=(const TemplateIterator& oth
 template <typename T>
 std::istream& operator>>(std::istream& is, List<T>& other)
 {
-    int size = other.size();
-    other.clear();
-    for (int i = 0; i < size; i++) {
-        T value;
-        is >> value;
+    T value;
+    while (is >> value)
+    {
         other.addToTail(value);
     }
     return is;
